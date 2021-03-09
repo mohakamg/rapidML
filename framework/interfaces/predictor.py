@@ -12,9 +12,8 @@ class Predictor:
     """
 
     def __init__(self, predictor_type: PredictorType,
-                 library: str, multioutput: bool,
+                 library: str,
                  data_x: pd.DataFrame, data_y: pd.DataFrame,
-                 metrics: List[MetricsCalculator],
                  data_split: Dict = {},
                  model_params: Dict = {},
                  metadata: Dict = {}):
@@ -28,20 +27,82 @@ class Predictor:
         :param data_split: Dictionary containing the training splits indexed by "train_pct" and "val_pct".
         :param model_params: Parameters of the model
         :param metadata: Dictionary describing any other information that must be stored along with the
-        model.
+        model. This might help in uniquely identifying the model
         :returns nothing
         """
         self.type = predictor_type
         self.library = library
-        self.multioutput = multioutput
 
         self.data_x = data_x
         self.data_y = data_y
         self.data_split = data_split
-        self.metrics = metrics
+
+        self.data_X_train, self.data_Y_train, \
+        self.data_X_val, self.data_Y_val, \
+        self.data_X_test, self.data_Y_test = self._generate_data_split()
+
+        self.metrics: List[MetricsCalculator] = []
 
         self.model_params = model_params
         self.metadata = metadata
+
+        # Internal Parameters that are used to store the
+        # latest state of the model.
+        self._trained_model = None
+        self._serialized_bytes: bytes = b""
+
+    def save_trained_model_state(self, trained_model) -> None:
+        """
+        This function stores the state of the trained model.
+        :param trained_model: Trained model
+        :return Nothing:
+        """
+        self._trained_model = trained_model
+
+    def save_trained_model_bytes(self, model_bytes) -> None:
+        """
+        This function stores the state of the trained model.
+        :param model_bytes: Trained model bytes
+        :return Nothing:
+        """
+        self._serialized_bytes = model_bytes
+
+    def get_trained_model(self):
+        """
+        This function returns the trained model if it exists.
+        :return self._trained_model:
+        """
+        if self._trained_model:
+            return self._trained_model
+
+    def get_trained_model_bytes(self) -> bytes:
+        """
+        This function returns the serialized model if it exists.
+        :return self._serialized_bytes:
+        """
+        if self._serialized_bytes:
+            return self._serialized_bytes
+
+    def register_metric(self, metric: MetricsCalculator) -> None:
+        """
+        This class registers the metric by type.
+        :param metric: An Object of MetricsCalculator
+        :returns: Nothing
+        """
+        self.metrics.append(metric)
+
+    def register_metric_by_name(self, metric: str) -> bool:
+        """
+        This function Adds a metric.
+        :param metric: String Describing the Metric.
+        :return registered: Notifies if the metric was registered successfully
+        """
+        registered = False
+        supported_metrics = self.type.fetch_supported_metrics()
+        if metric.lower() in supported_metrics:
+            self.register_metric(supported_metrics[metric.lower()])
+            registered = True
+        return registered
 
     def get_library(self) -> str:
         """
@@ -51,14 +112,14 @@ class Predictor:
         library = self.library
         return library
 
-    def does_support_multioutput(self) -> bool:
+    @staticmethod
+    def does_support_multiobjective() -> bool:
         """
         This function returns if the predictor supports multiple outputs
         or not.
         :return multioutput: Bool
         """
-        multioutput = self.multioutput
-        return multioutput
+        raise NotImplementedError
 
     def build_model(self, filtered_model_params: Dict):
         """

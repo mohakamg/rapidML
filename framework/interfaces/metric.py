@@ -1,6 +1,6 @@
 from typing import Dict
 
-from framework.stock.predictortype import PredictorType
+# from framework.stock.predictortype import PredictorType
 
 
 class MetricsCalculator:
@@ -9,7 +9,7 @@ class MetricsCalculator:
     to calculate a certain kind of metric.
     """
 
-    def __init__(self, predictor_type: PredictorType,
+    def __init__(self, predictor_type,
                  library: str, metric_params: Dict = None):
         """
         The constructor initializes the parameters.

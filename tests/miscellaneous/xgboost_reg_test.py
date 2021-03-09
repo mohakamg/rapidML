@@ -13,8 +13,8 @@ data_y = np.linspace(0, 100, num_points)
 data_y_df = pd.DataFrame(data_y)
 
 # Generate Input space features
-noise_std = 0
-target_dict = {f"feature_{val}": 2 * np.sin(data_y) + np.random.normal(5, noise_std, num_points) for val in range(output_space_dimensionality)}
+noise_std = 0.5
+target_dict = {f"feature_{val}": 2 * data_y + np.random.normal(5, noise_std, num_points) for val in range(output_space_dimensionality)}
 
 # Convert features Dictionary into dataframe
 target_df = pd.DataFrame(target_dict)

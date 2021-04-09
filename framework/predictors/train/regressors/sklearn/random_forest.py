@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 import onnxmltools
 import pandas as pd

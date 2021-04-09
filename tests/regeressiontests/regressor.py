@@ -86,7 +86,8 @@ class RegressorRegressionTest(unittest.TestCase):
 
     def test_training_1D_input_1D_output_linear(self):
         """
-
+        This function trains the predictor considering only
+        1 input and 1 output and knowing that
         """
         num_points = 50
         input_space_dimensionality = 1
@@ -98,6 +99,7 @@ class RegressorRegressionTest(unittest.TestCase):
         self.train(data_x_df, data_y_df)
 
     def test_training_1D_input_1D_output_sine(self):
+
 
         num_points = 50
         input_space_dimensionality = 1

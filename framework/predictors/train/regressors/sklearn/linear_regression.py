@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 import onnxmltools
 import pandas as pd
@@ -6,7 +6,6 @@ import numpy as np
 from onnxconverter_common import FloatTensorType
 from sklearn import linear_model
 
-from framework.interfaces.metric import MetricsCalculator
 from framework.interfaces.predictor import Predictor
 from framework.stock.predictortype import Regressor
 
@@ -17,14 +16,14 @@ class LinearRegression(Predictor):
     """
 
     def __init__(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
-                 metrics: List[MetricsCalculator],  data_split: Dict = {},
+                 data_split: Dict = {},
                  model_params: Dict = {}, metadata: Dict = {}):
         """
         The constructor intializes the base params.
         """
-        super().__init__(Regressor(), "sklearn", False,
+        super().__init__(Regressor(), "sklearn",
                          data_x, data_y,
-                         metrics, data_split,
+                         data_split,
                          model_params, metadata)
 
     def get_name(self) -> str:
@@ -34,6 +33,16 @@ class LinearRegression(Predictor):
         """
         name = f"{self.library} Linear Regression"
         return name
+
+    @staticmethod
+    def does_support_multiobjective() -> bool:
+        """
+        This function returns if the predictor supports multiple outputs
+        or not.
+        :return multioutput: Bool
+        """
+        multioutput = True
+        return multioutput
 
     def build_model(self, filtered_model_params: Dict) -> linear_model.LinearRegression:
         """
@@ -71,7 +80,6 @@ class LinearRegression(Predictor):
 
         # Train the model
         trained_model = model.fit(data_x_train.values, data_y_train.values)
-        print(f"Model Params After Training coef: {trained_model.coef_} | intercept: {trained_model.intercept_}")
 
         # Gather Train Predictions
         train_preds = trained_model.predict(data_x_train.values)
@@ -89,7 +97,6 @@ class LinearRegression(Predictor):
         combined_y_data = pd.concat([data_y_train, data_y_val],
                                     axis=0)
         trained_model = trained_model.fit(combined_x_data.values, combined_y_data.values)
-        print(f"Model Params After Validation coef: {trained_model.coef_} | intercept: {trained_model.intercept_}")
 
         # Get the predictions on the test data
         test_preds = trained_model.predict(data_x_train.values)

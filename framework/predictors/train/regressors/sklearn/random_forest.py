@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict
 
 import onnxmltools
 import pandas as pd
@@ -6,7 +6,6 @@ import numpy as np
 from onnxconverter_common import FloatTensorType
 from sklearn.ensemble import RandomForestRegressor
 
-from framework.interfaces.metric import MetricsCalculator
 from framework.interfaces.predictor import Predictor
 from framework.stock.predictortype import Regressor
 
@@ -17,14 +16,13 @@ class RandomForest(Predictor):
     """
 
     def __init__(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
-                 metrics: List[MetricsCalculator],  data_split: Dict = {},
+                 data_split: Dict = {},
                  model_params: Dict = {}, metadata: Dict = {}):
         """
         The constructor intializes the base params.
         """
-        super().__init__(Regressor(), "sklearn", True,
-                         data_x, data_y,
-                         metrics, data_split,
+        super().__init__(Regressor(), "sklearn",
+                         data_x, data_y, data_split,
                          model_params, metadata)
 
     def get_name(self) -> str:
@@ -34,6 +32,16 @@ class RandomForest(Predictor):
         """
         name = f"{self.library} Random Forest Regressor"
         return name
+
+    @staticmethod
+    def does_support_multiobjective() -> bool:
+        """
+        This function returns if the predictor supports multiple outputs
+        or not.
+        :return multioutput: Bool
+        """
+        multioutput = True
+        return multioutput
 
     def build_model(self, filtered_model_params: Dict) -> RandomForestRegressor:
         """

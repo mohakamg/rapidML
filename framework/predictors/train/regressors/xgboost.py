@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Union
 
 import pandas as pd
 import numpy as np
@@ -6,10 +6,8 @@ from onnxconverter_common import FloatTensorType
 from xgboost import XGBRegressor
 import onnxmltools
 
-from framework.interfaces.metric import MetricsCalculator
 from framework.interfaces.predictor import Predictor
 from framework.stock.predictortype import Regressor
-from utils.onnx_utils import convert_dataframe_schema
 
 
 class XGBoost(Predictor):
@@ -18,14 +16,14 @@ class XGBoost(Predictor):
     """
 
     def __init__(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
-                 metrics: List[MetricsCalculator],  data_split: Dict = {},
+                 data_split: Dict = {},
                  model_params: Dict = {}, metadata: Dict = {}):
         """
         The constructor intializes the base params.
         """
-        super().__init__(Regressor(), "xgboost", True,
+        super().__init__(Regressor(), "xgboost",
                          data_x, data_y,
-                         metrics, data_split,
+                         data_split,
                          model_params, metadata)
 
     def get_name(self) -> str:
@@ -129,6 +127,16 @@ class XGBoost(Predictor):
                                                  )
         serialized_model = onnx_model.SerializeToString()
         return serialized_model
+
+    @staticmethod
+    def does_support_multiobjective() -> bool:
+        """
+        This function returns if the predictor supports multiple outputs
+        or not.
+        :return multioutput: Bool
+        """
+        multioutput = False
+        return multioutput
 
     @staticmethod
     def get_default_params() -> Dict:

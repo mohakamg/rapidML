@@ -6,3 +6,4 @@ skl2onnx
 matplotlib
 xgboost
 onnxmltools
+flask

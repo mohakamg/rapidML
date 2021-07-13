@@ -5,36 +5,29 @@ from framework.stock.regressors import get_supported_regressors
 app = Flask(__name__)
 
 
-@app.route('/<name>', methods=['GET'])
+@app.route('predictors/<name>', methods=['GET'])
 def index(name):
     """
-    To url's with the following extension, '/regressors' or '/classifiers', they are only allowed to
+    To url's with the following extension, '/regressor' or '/classifier', they are only allowed to
     accept GET requests.
 
-    Case 1: /regressors
+    Case 1: predictors/regressor
 
     returns all supported regressors
 
-    Case 2: /classifiers
+    Case 2: predictors/classifier
 
     returns all supported classifiers
 
-    Case 3: /
-
-    returns a dict of all supported classifiers and regressors
-
-    :return:
+    :return: A dictionary containing either the supported regressors or classifiers.
     """
     supported_regressors = list(get_supported_regressors().keys())
     supported_classifiers = []
 
-    if name == "":
-        # Return both supported types
-        return {'regressors': supported_regressors, 'classifiers': supported_classifiers}
-    elif name == 'regressors':
-        return {"regressors": supported_regressors}
-    elif name == 'classifiers':
-        return {"classifiers": supported_classifiers}
+    if name == 'regressor':
+        return {"regressor": supported_regressors}
+    elif name == 'classifier':
+        return {"classifier": supported_classifiers}
 
     return f"{name} is not valid argument"
 

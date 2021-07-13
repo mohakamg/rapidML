@@ -5,7 +5,7 @@ from framework.stock.regressors import get_supported_regressors
 app = Flask(__name__)
 
 
-@app.route('predictors/<name>', methods=['GET'])
+@app.route('/predictors/<name>', methods=['GET'])
 def index(name):
     """
     To url's with the following extension, '/regressor' or '/classifier', they are only allowed to

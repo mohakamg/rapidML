@@ -33,4 +33,4 @@ if __name__ == "__main__":
     test_obj = ServerTest()
     response = test_obj.get_supported_regressors_test()
 
-    print(f"Supported Regressors: {response['body']}")
+    print(f"Supported Regressors: {response['body']['regressor']}")

@@ -32,9 +32,9 @@ def index(name):
         # Return both supported types
         return {'regressors': supported_regressors, 'classifiers': supported_classifiers}
     elif name == 'regressors':
-        return supported_regressors
+        return {"regressors": supported_regressors}
     elif name == 'classifiers':
-        return supported_classifiers
+        return {"classifiers": supported_classifiers}
 
     return f"{name} is not valid argument"
 

@@ -1,3 +1,5 @@
+import json
+
 import requests
 
 
@@ -26,7 +28,7 @@ class ServerTest:
             print(f"Test Failed with {status_code} status code.")
             print(f"response: {response_body}\n")
 
-        return {"status_code": status_code, "body": response_body}
+        return json.loads(response_body)
 
 
 if __name__ == "__main__":

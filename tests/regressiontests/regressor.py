@@ -80,9 +80,9 @@ class RegressorRegressionTest(unittest.TestCase):
 
         data = pd.concat([data_x_df, data_y_df], axis=1)
         cao_mapping = {
-            "context": data_x_df.columns.values,
+            "context": data_x_df.columns.values.tolist(),
             "actions": [],
-            "outcomes": data_y_df.columns.values
+            "outcomes": data_y_df.columns.values.tolist()
         }
 
         for predictor_name, predictor in self.availaible_predictors.items():
@@ -221,12 +221,19 @@ class RegressorRegressionTest(unittest.TestCase):
                                                         output_space_dimensionality, "sine")
         self.train(data_x_df, data_y_df)
 
+        data = pd.concat([data_x_df, data_y_df], axis=1)
+        cao_mapping = {
+            "context": data_x_df.columns.values.tolist(),
+            "actions": [],
+            "outcomes": data_y_df.columns.values.tolist()
+        }
+
 
         metrics = [MeanAbsoluteError()]
         for predictor_name, predictor in self.availaible_predictors.items():
             print(f"Evaluating Predictor: ", predictor_name)
             executor = Executor(
-                predictor, data_x_df, data_y_df, {}, {}, metrics, "", {}
+                predictor, data, cao_mapping, {}, {}, metrics, "", {}
             )
             executor.execute()
 

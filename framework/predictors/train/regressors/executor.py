@@ -95,7 +95,7 @@ class Executor:
         predictors = []
         if len(coa_mapping["outcomes"]) > 1 and self.predictor_class_ref.does_support_multiobjective():
             model_metadata_copy = copy.deepcopy(model_metadata)
-            model_metadata_copy["inputs"] = coa_mapping["context"].tolist().extend(coa_mapping["actions"])
+            model_metadata_copy["inputs"] = coa_mapping["context"] + coa_mapping["actions"]
             model_metadata_copy["outputs"] = coa_mapping["outcomes"]
             model_metadata_copy["data_split"] = data_split
             predictor = self._create_predictor(

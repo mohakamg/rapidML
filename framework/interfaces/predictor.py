@@ -192,6 +192,16 @@ class Predictor:
         """
         raise NotImplementedError
 
+    def export_model(self, op_path):
+        """
+        
+        :param op_path: 
+        :return: 
+        """
+        # Save the Model Locally
+        with open(op_path, "wb") as f:
+            f.write(self._serialized_bytes)
+
     @staticmethod
     def get_default_params() -> Dict:
         """

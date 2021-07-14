@@ -1,3 +1,4 @@
+import json
 import unittest
 import os
 import numpy as np
@@ -79,11 +80,14 @@ class RegressorRegressionTest(unittest.TestCase):
         metrics = [MeanAbsoluteError()]
 
         data = pd.concat([data_x_df, data_y_df], axis=1)
+        data.to_csv('sample_dataset.csv')
         cao_mapping = {
             "context": data_x_df.columns.values.tolist(),
             "actions": [],
             "outcomes": data_y_df.columns.values.tolist()
         }
+        with open('sample_cao_mapping.json', 'w') as f:
+            json.dump(cao_mapping, f)
 
         for predictor_name, predictor in self.availaible_predictors.items():
             print(f"Evaluating Predictor: ", predictor_name)

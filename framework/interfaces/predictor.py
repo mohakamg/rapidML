@@ -1,4 +1,4 @@
-from typing import Dict, List
+from typing import Dict, List, Tuple
 import pandas as pd
 
 from framework.interfaces.metric import MetricsCalculator
@@ -13,7 +13,7 @@ class Predictor:
 
     def __init__(self, predictor_type: PredictorType,
                  library: str,
-                 data_x: pd.DataFrame, data_y: pd.DataFrame,
+                 data: pd.DataFrame, coa_mapping: Dict = {},
                  data_split: Dict = {},
                  model_params: Dict = {},
                  metadata: Dict = {}):
@@ -21,9 +21,9 @@ class Predictor:
         The constructor initializes the predictor, its params and the metadata.
         :param predictor_type: A predictor type that inherits from PredictorType
         :param library: Library this predictor belongs to
-        :param multioutput: Specifies if the predictor supports multioutput.
-        :param data_x: DataFrame containing the processed input features
-        :param data_y: DataFrame containing the processed output features
+        :param data: DataFrame containing all processed data
+        :param coa_mapping: Dictionary containing the mapping of indices from data to context, action, or
+        outcome.
         :param data_split: Dictionary containing the training splits indexed by "train_pct" and "val_pct".
         :param model_params: Parameters of the model
         :param metadata: Dictionary describing any other information that must be stored along with the
@@ -33,8 +33,9 @@ class Predictor:
         self.type = predictor_type
         self.library = library
 
-        self.data_x = data_x
-        self.data_y = data_y
+        # Call data split function here
+        self.data_x, self.data_y = self.get_data_xy_split(data, coa_mapping)
+
         self.data_split = data_split
 
         self.data_X_train, self.data_Y_train, \
@@ -211,6 +212,35 @@ class Predictor:
         :return name: String
         """
         raise NotImplementedError
+
+    @staticmethod
+    def get_data_xy_split(data: pd.DataFrame,
+                          coa_mapping: Dict = {}) -> Tuple[pd.DataFrame, pd.DataFrame]:
+        """
+
+        This function takes a dataframe and a dictionary mapping indices to context,
+        action, or outcome. This then splits the dataframe into two dataframes based
+        on it's COA tagging.
+
+        data_x: Context and Action
+        data_y: Outcome
+
+        :param data:
+        :param coa_mapping:
+        :return: A tuple containing two dataframes: data_x and data_y
+        """
+        data_x = pd.DataFrame()
+        data_y = pd.DataFrame()
+
+        for column in data.columns:
+            if coa_mapping[column] in ['context', 'action']:
+                # Add context and action columns to data_x
+                data_x[column] = data[column]
+            elif coa_mapping[column] in ['outcome']:
+                # Add outcome columns to data_y
+                data_y[column] = data[column]
+
+        return data_x, data_y
 
     def __str__(self):
         return self.get_name()

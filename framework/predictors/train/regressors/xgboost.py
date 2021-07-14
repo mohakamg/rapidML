@@ -1,4 +1,4 @@
-from typing import Dict, List, Union
+from typing import Dict
 
 import pandas as pd
 import numpy as np
@@ -15,14 +15,14 @@ class XGBoost(Predictor):
     This class implements a Random Forest regression model from the SKlearn library.
     """
 
-    def __init__(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
+    def __init__(self, data: pd.DataFrame, coa_mapping: Dict = {},
                  data_split: Dict = {},
                  model_params: Dict = {}, metadata: Dict = {}):
         """
         The constructor intializes the base params.
         """
         super().__init__(Regressor(), "xgboost",
-                         data_x, data_y,
+                         data, coa_mapping,
                          data_split,
                          model_params, metadata)
 

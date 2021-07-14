@@ -51,7 +51,7 @@ if __name__ == '__main__':
     if predictor_type == "regressor":
         predictor = get_supported_regressors().get(predictor_name, None)
     elif predictor_type == 'classifier':
-        predictor = get_supported_classifiers().get(predictor_type, None)
+        predictor = get_supported_classifiers().get(predictor_name, None)
 
     if predictor is not None:
 

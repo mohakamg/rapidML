@@ -15,7 +15,7 @@ class Executor:
     """
 
     def __init__(self, predictor_class_ref,
-                 data_x: pd.DataFrame, data_y: pd.DataFrame,
+                 data: pd.DataFrame, coa_mapping: Dict,
                  data_split: Dict,
                  model_params: Dict, metrics: Union[List[str], List[MetricsCalculator]],
                  executor_name: str, model_metadata: Dict = {}):
@@ -25,7 +25,7 @@ class Executor:
 
         self.predictor_class_ref = predictor_class_ref
         self._predictors: List[Predictor] = self._create_predictors(
-            data_x, data_y, data_split, model_params, metrics, model_metadata
+            data, coa_mapping, data_split, model_params, metrics, model_metadata
         )
         self.executor_name = executor_name
 
@@ -54,7 +54,7 @@ class Executor:
         """
         return self._predictors
 
-    def _create_predictor(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
+    def _create_predictor(self, data: pd.DataFrame, coa_mapping: Dict,
                           data_split: Dict,
                           model_params: Dict, metrics: Union[List[str], List[MetricsCalculator]],
                           model_metadata: Dict = {}) -> Predictor:
@@ -63,7 +63,7 @@ class Executor:
         :return predictor: Predictor with the desired output.
         """
         # Create the Predictor
-        predictor: Predictor = self.predictor_class_ref(data_x, data_y,
+        predictor: Predictor = self.predictor_class_ref(data, coa_mapping,
                             data_split,
                             model_params,
                             model_metadata)
@@ -77,15 +77,15 @@ class Executor:
 
         return predictor
 
-    def _create_predictors(self, data_x: pd.DataFrame, data_y: pd.DataFrame,
+    def _create_predictors(self, data: pd.DataFrame, coa_mapping: Dict,
                            data_split: Dict,
                            model_params: Dict, metrics: Union[List[str], List[MetricsCalculator]],
                            model_metadata: Dict = {}) -> List[Predictor]:
         """
         This function is responsible for creating one or more predictors depending on
         the ability to support multiple outputs or not
-        :param data_x:
-        :param data_y:
+        :param data:
+        ::
         :param data_split:
         :param model_params:
         :param metrics:
@@ -93,14 +93,13 @@ class Executor:
         :return:
         """
         predictors = []
-        if data_y.shape[1] > 1 and self.predictor_class_ref.does_support_multiobjective():
+        if len(coa_mapping["outcomes"]) > 1 and self.predictor_class_ref.does_support_multiobjective():
             model_metadata_copy = copy.deepcopy(model_metadata)
-            model_metadata_copy["inputs"] = data_x.columns.values
-            model_metadata_copy["outputs"] = data_y.columns.values
+            model_metadata_copy["inputs"] = coa_mapping["context"] + coa_mapping["actions"]
+            model_metadata_copy["outputs"] = coa_mapping["outcomes"]
             model_metadata_copy["data_split"] = data_split
             predictor = self._create_predictor(
-                data_x,
-                data_y,
+                data, coa_mapping,
                 data_split,
                 model_params,
                 metrics,
@@ -109,16 +108,17 @@ class Executor:
             predictors = [predictor]
         else:
             model_metadata_copy = copy.deepcopy(model_metadata)
-            model_metadata_copy["inputs"] = data_x.columns.values
+            model_metadata_copy["inputs"] = coa_mapping["context"] + coa_mapping["actions"]
             model_metadata_copy["data_split"] = data_split
 
             # Create one predictor per output
-            for column in data_y.columns.values:
-                op_dataframe = pd.DataFrame(data_y[column])
+            for column in coa_mapping["outcomes"]:
+                coa_mapping_per_outcome = copy.copy(coa_mapping)
+                coa_mapping_per_outcome["outcomes"] = [column]
                 model_metadata_copy["outputs"] = [column]
                 predictor = self._create_predictor(
-                    data_x,
-                    op_dataframe,
+                    data,
+                    coa_mapping_per_outcome,
                     data_split,
                     model_params,
                     metrics,

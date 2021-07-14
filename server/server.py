@@ -111,9 +111,10 @@ def train_route():
                             )
 
         executor.execute()
+
+        return "Training Complete"
     else:
-        print('No Valid Predictor Selected.')
-        exit(0)
+        return 'No Valid Predictor Selected.'
 
 
 if __name__ == '__main__':

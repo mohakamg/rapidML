@@ -239,6 +239,7 @@ class Predictor:
         :param coa_mapping:
         :return: A tuple containing two dataframes: data_x and data_y
         """
+        
         data_x = data[coa_mapping["context"] + coa_mapping["actions"]]
         data_y = data[coa_mapping["outcomes"]]
 

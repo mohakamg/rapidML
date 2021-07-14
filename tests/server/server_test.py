@@ -124,8 +124,10 @@ class ServerTest:
                             model_metadata=config['model_metadata']
         """
 
-        with open('sample_cao_mapping.json', 'w') as f:
-            cao_mapping = json.load(f)
+        # with open('sample_cao_mapping.json', 'r') as f:
+        #     cao_mapping = json.load(f)
+        
+        cao_mapping = {"context": ["0", "1"], "actions": [], "outcomes": ["feature_0", "feature_1"]}
 
         payload = {
             'data_path': 'sample_dataset.csv',
@@ -157,6 +159,7 @@ class ServerTest:
             print(f"Test Failed with {status_code} status code.")
             print(f"response: {response_body}\n")
 
+
 if __name__ == "__main__":
     test_obj = ServerTest()
 
@@ -165,3 +168,5 @@ if __name__ == "__main__":
     test_obj.get_supported_metrics_test()
 
     test_obj.get_default_params_test()
+
+    test_obj.train_test()

@@ -80,7 +80,7 @@ class RegressorRegressionTest(unittest.TestCase):
         metrics = [MeanAbsoluteError()]
 
         data = pd.concat([data_x_df, data_y_df], axis=1)
-        data.to_csv('sample_dataset.csv')
+        data.to_csv('sample_dataset.csv', index=False)
         cao_mapping = {
             "context": data_x_df.columns.values.tolist(),
             "actions": [],

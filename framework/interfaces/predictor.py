@@ -222,23 +222,15 @@ class Predictor:
         action, or outcome. This then splits the dataframe into two dataframes based
         on it's COA tagging.
 
-        data_x: Context and Action
-        data_y: Outcome
+        data_x: Context and Actions
+        data_y: Outcomes
 
         :param data:
         :param coa_mapping:
         :return: A tuple containing two dataframes: data_x and data_y
         """
-        data_x = pd.DataFrame()
-        data_y = pd.DataFrame()
-
-        for column in data.columns:
-            if coa_mapping[column] in ['context', 'action']:
-                # Add context and action columns to data_x
-                data_x[column] = data[column]
-            elif coa_mapping[column] in ['outcome']:
-                # Add outcome columns to data_y
-                data_y[column] = data[column]
+        data_x = data[coa_mapping["context"] + coa_mapping["actions"]]
+        data_y = data[coa_mapping["outcomes"]]
 
         return data_x, data_y
 

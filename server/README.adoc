@@ -1,0 +1,200 @@
+= Surrogate Server
+ifdef::env-github[]
+:imagesdir:
+https://raw.githubusercontent.com/leaf-ai/unileaf/main/docs/artwork
+:tip-caption: :bulb:
+:note-caption: :information_source:
+:important-caption: :heavy_exclamation_mark:
+:caution-caption: :fire:
+:warning-caption: :warning:
+endif::[]
+
+ifndef::env-github[]
+:imagesdir: ./
+endif::[]
+
+:Revision: 0.0.1-main-aaaagqacvoy
+
+:source-highlighter: pygments
+:source-language: bash
+
+:toc:
+
+This document describes the Surrogate Server.
+
+This document is aimed at an audience with development and deployment skills who desire to implement services using Python.
+
+The Surrogate Server is motivated by a need for the front-end to get information on predictors and train them.
+
+== Setup and build
+
+=== Prerequisties
+
+Download Python 3.8 from https://www.python.org/downloads/.
+
+=== Run Server
+[source]
+----
+
+git clone https://github.com/mohakamg/rapidML.git
+cd rapidML
+
+pip install -r requirements.txt
+
+python3 -m server.server
+----
+
+
+=== Test Server
+
+In another shell on the same machine, you can run a test on the server to ensure that it's running
+as expected. 
+
+[source]
+----
+python3 -m tests.server.server_test
+----
+
+== Server Route Definitions
+
+=== Get Supported Predictors
+
+This route returns a list of supported predictors that fall under 
+a specified category that is passed in the URL.
+
+[.underline]#Route#: /predictors/<predictor_type>
+
+[.underline]#Request Type#: GET
+
+[.underline]#Sample Request#: 
+
+Route: /predictors/regressors
+
+Body: N/A
+
+[.underline]#Sample Response#:
+
+Body: 
+
+[json]
+----
+{
+    regressor: []
+}
+----
+
+=== Get Supported Metrics
+
+This route returns a list of supported metrics corresponding with  
+a specified category that is passed in the URL.
+
+[.underline]#Route#: /metrics/<predictor_type>
+
+[.underline]#Request Type#: GET
+
+[.underline]#Sample Request#: 
+
+Route: /metrics/regressors
+
+Body: N/A
+
+[.underline]#Sample Response#:
+
+Body: 
+
+[json]
+----
+{
+    regressor: []
+}
+----
+
+=== Get Default Params
+
+This route returns a json containing all params with corresponding default 
+values for a specific predictor where the type and name are provided in 
+the URL.
+
+[.underline]#Route#: /default_params/<predictor_type>/<predictor_name>
+
+[.underline]#Request Type#: GET
+
+[.underline]#Sample Request#: 
+
+Route: /default_params/regressor/Linear%20Regressor
+
+Body: N/A
+
+[.underline]#Sample Response#:
+
+Body: 
+
+[json]
+----
+{
+    "fit_intercept": {
+        "default_value": True,
+        "description": "Whether to calculate the intercept for this model. "
+                        "If set to False, no intercept will be used in calculations "
+                        "(i.e. data is expected to be centered).",
+        "type": "bool"
+    },
+    "normalize": {
+        "default_value": False,
+        "description": "This parameter is ignored when ``fit_intercept`` is set to False. "
+                        "If True, the regressors X will be normalized before regression by "
+                        "subtracting the mean and dividing by the l2-norm.",
+        "type": "bool"
+    },
+    "positive": {
+        "default_value": False,
+        "description": "When set to ``True``, forces the coefficients to be positive. "
+                        "This option is only supported for dense arrays.",
+        "type": "bool"
+    }
+}
+----
+
+=== Train
+
+This function kicks off training locally.
+
+[.underline]#Route#: /train
+
+[.underline]#Request Type#: POST
+
+[.underline]#Sample Request#: 
+
+Route: /train
+
+Body: 
+
+[json]
+----
+{
+    "data_path": "dataset.csv",
+    "output_path": "./output_data",
+    "config": {
+        "predictor_type": "regressor",
+        "predictor_name": "XGBoost",
+        "cao_mapping": {
+            "context": [],
+            "actions": [],
+            "outcomes": []
+        },
+        "data_split": {},
+        "model_params": {},
+        "metrics": "Mean Absolute Error",
+        "model_metadata": {}
+    }
+}
+----
+
+[.underline]#Sample Response#:
+
+Body: 
+
+[source]
+----
+Training Complete
+----

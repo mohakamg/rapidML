@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS
 import pandas as pd
 import uuid
 from framework.predictors.train.regressors.executor import Executor
@@ -8,7 +9,7 @@ from framework.stock.metrics import get_regression_metrics, get_classifcation_me
 
 # create the flask routing object
 app = Flask(__name__)
-
+CORS(app)
 
 @app.route('/predictors/<name>', methods=['GET'])
 def predictors(name):

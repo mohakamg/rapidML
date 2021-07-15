@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import onnxmltools
 import pandas as pd
@@ -60,7 +60,7 @@ class LinearRegression(Predictor):
     def train_model(self, model: linear_model.LinearRegression,
                     data_x_train: pd.DataFrame, data_y_train: pd.DataFrame,
                     data_x_val: pd.DataFrame, data_y_val: pd.DataFrame,
-                    data_x_test: pd.DataFrame, data_y_test: pd.DataFrame) -> [linear_model.LinearRegression, Dict]:
+                    data_x_test: pd.DataFrame, data_y_test: pd.DataFrame) -> Tuple[linear_model.LinearRegression, Dict]:
         """
         This function must be overriden to train the built model from the build_model step
         given the Data and must return the trained model and the desired metrics as a dictionary.
@@ -127,18 +127,21 @@ class LinearRegression(Predictor):
                 "default_value": True,
                 "description": "Whether to calculate the intercept for this model. "
                                "If set to False, no intercept will be used in calculations "
-                               "(i.e. data is expected to be centered)."
+                               "(i.e. data is expected to be centered).",
+                "type": "bool"
             },
             "normalize": {
                 "default_value": False,
                 "description": "This parameter is ignored when ``fit_intercept`` is set to False. "
                                "If True, the regressors X will be normalized before regression by "
-                               "subtracting the mean and dividing by the l2-norm."
+                               "subtracting the mean and dividing by the l2-norm.",
+                "type": "bool"
             },
             "positive": {
                 "default_value": False,
                 "description": "When set to ``True``, forces the coefficients to be positive. "
-                               "This option is only supported for dense arrays."
+                               "This option is only supported for dense arrays.",
+                "type": "bool"
             }
         }
 

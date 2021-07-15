@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Tuple
 
 import onnxmltools
 import pandas as pd
@@ -72,7 +72,7 @@ class RandomForest(Predictor):
     def train_model(self, model: RandomForestRegressor,
                     data_x_train: pd.DataFrame, data_y_train: pd.DataFrame,
                     data_x_val: pd.DataFrame, data_y_val: pd.DataFrame,
-                    data_x_test: pd.DataFrame, data_y_test: pd.DataFrame) -> [RandomForestRegressor, Dict]:
+                    data_x_test: pd.DataFrame, data_y_test: pd.DataFrame) -> Tuple[RandomForestRegressor, Dict]:
         """
         This function must be overriden to train the built model from the build_model step
         given the Data and must return the trained model and the desired metrics as a dictionary.
@@ -136,28 +136,32 @@ class RandomForest(Predictor):
         default_params = {
             "n_estimators": {
                 "default_value": 100,
-                "description": "The number of trees in the forest."
+                "description": "The number of trees in the forest.",
+                "type": "int"
             },
             "criterion": {
                 "default_value": "mse",
                 "description": "The function to measure the quality of a split. "
                                "Supported criteria are “mse” for the mean squared error, "
                                "which is equal to variance reduction as feature selection "
-                               "criterion, and “mae” for the mean absolute error. Options: {'mse', 'mae'}"
+                               "criterion, and “mae” for the mean absolute error. Options: {'mse', 'mae'}",
+                "type": ['mse', 'mae']
             },
             "max_depth": {
-                "default_value": None,
+                "default_value": 100,
                 "description": "The maximum depth of the tree. "
                                "If None, then nodes are expanded until all "
                                "leaves are pure or until all leaves contain less than "
-                               "min_samples_split samples."
+                               "min_samples_split samples.",
+                "type": "int"
             },
             "min_samples_split": {
-                "default_value": 2,
-                "description": "The minimum number of samples required to split an internal node."
+                "default_value": 2.0,
+                "description": "The minimum number of samples required to split an internal node.",
+                "type": "float"
             },
             "min_samples_leaf": {
-                "default_value": 1,
+                "default_value": 1.0,
                 "description": '''
                 The minimum number of samples required to be at a leaf node. 
                 A split point at any depth will only be considered if it 
@@ -167,13 +171,15 @@ class RandomForest(Predictor):
                 If int, then consider min_samples_leaf as the minimum number.
                 If float, then min_samples_leaf is a fraction and ceil(min_samples_leaf * n_samples) 
                 are the minimum number of samples for each node.
-                '''
+                ''',
+                "type": "float"
             },
             "min_weight_fraction_leaf": {
                 "default_value": 0.0,
                 "description": "The minimum weighted fraction of the sum total of"
                                " weights (of all the input samples) required to be at a leaf node. "
-                               "Samples have equal weight when sample_weight is not provided."
+                               "Samples have equal weight when sample_weight is not provided.",
+                "type": "float"
             },
             "max_features": {
                 "default_value": "auto",
@@ -189,13 +195,15 @@ class RandomForest(Predictor):
                 If None, then max_features=n_features.
                 Note: the search for a split does not stop until at least one valid partition of the node samples 
                 is found, even if it requires to effectively inspect more than max_features features.
-                '''
+                ''',
+                "type": ["auto", "sqrt", "log2"]
             },
             "max_leaf_nodes": {
-                "default_value": None,
+                "default_value": 100,
                 "description": "Grow trees with max_leaf_nodes in best-first fashion. "
                                "Best nodes are defined as relative reduction in impurity. "
-                               "If None then unlimited number of leaf nodes."
+                               "If None then unlimited number of leaf nodes.",
+                "type": "int"
             },
             "min_impurity_decrease": {
                 "default_value": 0.0,
@@ -211,49 +219,51 @@ class RandomForest(Predictor):
                 N_t_L is the number of samples in the left child, and N_t_R is the number of samples in the right child.
                 
                 N, N_t, N_t_R and N_t_L all refer to the weighted sum, if sample_weight is passed.
-                '''
-            },
-            "min_impurity_split": {
-                "default_value": None,
-                "description": "Threshold for early stopping in tree growth. "
-                               "A node will split if its impurity is above the threshold, otherwise it is a leaf."
+                ''',
+                "type": "float"
             },
             "bootstrap": {
                 "default_value": True,
                 "description": "Whether bootstrap samples are used when building trees. "
-                               "If False, the whole dataset is used to build each tree."
+                               "If False, the whole dataset is used to build each tree.",
+                "type": "bool"
             },
             "oob_score": {
-                "default_value": None,
-                "description": "whether to use out-of-bag samples to estimate the R^2 on unseen data"
+                "default_value": False,
+                "description": "whether to use out-of-bag samples to estimate the R^2 on unseen data",
+                "type": "bool"
             },
             "n_jobs": {
-                "default_value": None,
+                "default_value": 1,
                 "description": "The number of jobs to run in parallel. fit, predict, "
                                "decision_path and apply are all parallelized over the trees. "
                                "None means 1 unless in a joblib.parallel_backend context. "
-                               "-1 means using all processors. See Glossary for more details."
+                               "-1 means using all processors. See Glossary for more details.",
+                "type": "int"
             },
             "random_state": {
-                "default_value": None,
+                "default_value": 0,
                 "description": "Controls both the randomness of the bootstrapping of the samples "
                                "used when building trees (if bootstrap=True) and the sampling of the "
                                "features to consider when looking for the best split at each "
-                               "node (if max_features < n_features)"
+                               "node (if max_features < n_features)",
+                "type": "int"
             },
             "warm_start": {
                 "default_value": False,
                 "description": "When set to True, reuse the solution of the previous call to "
-                               "fit and add more estimators to the ensemble, otherwise, just fit a whole new forest."
+                               "fit and add more estimators to the ensemble, otherwise, just fit a whole new forest.",
+                "type": "bool"
             },
             "ccp_alpha": {
                 "default_value": 0.0,
                 "description": "Complexity parameter used for Minimal Cost-Complexity Pruning. "
                                "The subtree with the largest cost complexity that is smaller than "
-                               "ccp_alpha will be chosen. By default, no pruning is performed. "
+                               "ccp_alpha will be chosen. By default, no pruning is performed. ",
+                "type": "float"
             },
             "max_samples": {
-                "default_value": None,
+                "default_value": 1.0,
                 "description": '''
                 If bootstrap is True, the number of samples to draw from X to train each base estimator.
                 
@@ -261,7 +271,8 @@ class RandomForest(Predictor):
                 If int, then draw max_samples samples.
                 If float, then draw max_samples * X.shape[0] samples. 
                 Thus, max_samples should be in the interval (0, 1).
-                '''
+                ''',
+                "type": "float"
             }
         }
 

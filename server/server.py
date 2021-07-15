@@ -14,16 +14,22 @@ CORS(app)
 @app.route('/predictors/<name>', methods=['GET'])
 def predictors(name):
     """
-    To url's with the following extension, '/regressor' or '/classifier', they are only allowed to
-    accept GET requests.
+    This route returns supported predictors that fall under specific categories.
 
     Case 1: predictors/regressor
 
-    returns all supported regressors
+    RESPONSE: 
+    {
+        regressor: []
+    }
 
     Case 2: predictors/classifier
 
-    returns all supported classifiers
+    RESPONSE: 
+    {
+        classifier: []
+    }
+
 
     :return: A dictionary containing either the supported regressors or classifiers.
     """
@@ -41,16 +47,21 @@ def predictors(name):
 @app.route('/metrics/<name>', methods=['GET'])
 def metrics(name):
     """
-    To url's with the following extension, '/regressor' or '/classifier', they are only allowed to
-    accept GET requests.
+    This route returns supported metrics for specific types of predictors.
 
     Case 1: metrtics/regressor
 
-    returns all supported regressors
+    RESPONSE: 
+    {
+        regressor: []
+    }
 
     Case 2: metrics/classifier
 
-    returns all supported classifiers
+    RESPONSE: 
+    {
+        classifier: []
+    }
 
     :return: A dictionary containing either the supported regressors or classifiers.
     """
@@ -67,6 +78,39 @@ def metrics(name):
 
 @app.route('/default_params/<pred_type>/<pred_name>', methods=['GET'])
 def default_params(pred_type, pred_name):
+    """
+    
+    This function returns a json with all default params for specific
+    predictors.
+
+    Example:
+    route call: /default_params/regressor/Linear%20Regressor
+
+    RESPONSE:
+    {
+        "fit_intercept": {
+            "default_value": True,
+            "description": "Whether to calculate the intercept for this model. "
+                            "If set to False, no intercept will be used in calculations "
+                            "(i.e. data is expected to be centered).",
+            "type": "bool"
+        },
+        "normalize": {
+            "default_value": False,
+            "description": "This parameter is ignored when ``fit_intercept`` is set to False. "
+                            "If True, the regressors X will be normalized before regression by "
+                            "subtracting the mean and dividing by the l2-norm.",
+            "type": "bool"
+        },
+        "positive": {
+            "default_value": False,
+            "description": "When set to ``True``, forces the coefficients to be positive. "
+                            "This option is only supported for dense arrays.",
+            "type": "bool"
+        }
+    }
+
+    """
     predictor = None
 
     if pred_type == "regressor":
@@ -82,6 +126,37 @@ def default_params(pred_type, pred_name):
 
 @app.route('/train', methods=['POST'])
 def train_route():
+    """
+    This function kicks off training locally.
+
+    REQUEST:
+    {
+        "data_path": "dataset.csv",
+        "output_path": "./output_data",
+        "config": {
+            "predictor_type": "regressor",
+            "predictor_name": "XGBoost",
+            "cao_mapping": {
+                "context": [],
+                "actions": [],
+                "outcomes": []
+            },
+            "data_split": {},
+            "model_params": {},
+            "metrics": "Mean Absolute Error",
+            "model_metadata": {}
+        }
+    }
+
+    RESPONSE:
+
+    If Successful:
+    "Training Complete"
+    
+    If Unsuccessful:
+    "No Valid Predictor Selected."
+
+    """
     request_json = request.json
     config = request_json['config']
     data_path = request_json['data_path']
@@ -122,8 +197,8 @@ if __name__ == '__main__':
     """
     This function routes to the specified IP and port number:
     
-    IP: 0.0.0.0
+    IP: localhost or 127.0.0.1
     port: 8080
     
     """
-    app.run(debug=True, host='localhost', port=8080)
+    app.run(host='localhost', port=8080)

@@ -61,10 +61,10 @@ class XGBoost(Predictor):
             scale_pos_weight=filtered_model_params["scale_pos_weight"],
             base_score=filtered_model_params["base_score"],
             random_state=filtered_model_params["random_state"],
-            missing=np.nan,
+            # missing=np.nan,
             num_parallel_tree=filtered_model_params["num_parallel_tree"],
-            monotone_constraints=filtered_model_params["monotone_constraints"],
-            interaction_constraints=filtered_model_params["interaction_constraints"],
+            # monotone_constraints=filtered_model_params["monotone_constraints"],
+            # interaction_constraints=filtered_model_params["interaction_constraints"],
             importance_type=filtered_model_params["importance_type"]
         )
         return model
@@ -142,128 +142,159 @@ class XGBoost(Predictor):
     def get_default_params() -> Dict:
         """
         This function returns the default parameters along with a description.
+
+        Note:
+        Params not included at the moment:
+        - monotone_constraints
+        - interaction_constraints
+        - missing
+
         :return default_params: Default values with Description.
         """
         default_params = {
             "n_estimators": {
                 "default_value": 100,
                 "description": "Number of gradient boosted trees.  "
-                               "Equivalent to number of boosting rounds."
+                               "Equivalent to number of boosting rounds.",
+                "type": "int"
             },
             "max_depth": {
-                "default_value": None,
-                "description": "Maximum tree depth for base learners."
+                "default_value": 6,
+                "description": "Maximum tree depth for base learners.",
+                "type": "int"
             },
             "learning_rate": {
-                "default_value": None,
-                "description": "Boosting learning rate (xgb's 'eta')"
+                "default_value": 0.3,
+                "description": "Boosting learning rate (xgb's 'eta')",
+                "type": "float"
             },
             "verbosity": {
-                "default_value": None,
-                "description": "The degree of verbosity. Valid values are 0 (silent) - 3 (debug)."
+                "default_value": 1,
+                "description": "The degree of verbosity. Valid values are 0 (silent) - 3 (debug).",
+                "type": [0, 1, 2, 3]
             },
             "booster": {
-                "default_value": None,
-                "description": "Specify which booster to use: gbtree, gblinear or dart."
+                "default_value": "gbtree",
+                "description": "Specify which booster to use: gbtree, gblinear or dart.",
+                "type": ['gbtree', 'gblinear', 'dart']
             },
             "tree_method": {
-                "default_value": None,
+                "default_value": "auto",
                 "description":
                     '''
                     Specify which tree method to use.  Default to auto.  If this parameter
                     is set to default, XGBoost will choose the most conservative option
                     available.  It's recommended to study this option from parameters
                     document.
-                    '''
+                    ''',
+                "type": ["auto", "exact", "approx", "hist", "gpu_hist"]
             },
             "n_jobs": {
-                "default_value": None,
+                "default_value": 1,
                 "description": '''
                 Number of parallel threads used to run xgboost.  When used with other Scikit-Learn
                 algorithms like grid search, you may choose which algorithm to parallelize and
                 balance the threads.  Creating thread contention will significantly slow dowm both
                 algorithms.
-                '''
+                ''',
+                "type": "int"
             },
             "gamma": {
-                "default_value": None,
+                "default_value": 0.0,
                 "description": "Minimum loss reduction required to make a further "
-                               "partition on a leaf node of the tree."
+                               "partition on a leaf node of the tree.",
+                "type": "float"
             },
             "min_child_weight": {
-                "default_value": None,
+                "default_value": 1.0,
                 "description": "Minimum loss reduction required to make a further "
-                               "partition on a leaf node of the tree."
+                               "partition on a leaf node of the tree.",
+                "type": "float"
             },
             "max_delta_step": {
-                "default_value": None,
-                "description": "Maximum delta step we allow each tree's weight estimation to be."
+                "default_value": 0.0,
+                "description": "Maximum delta step we allow each tree's weight estimation to be.",
+                "type": "float"
             },
             "subsample": {
-                "default_value": None,
-                "description": "Subsample ratio of the training instance."
+                "default_value": 1.0,
+                "description": "Subsample ratio of the training instance.",
+                "type": "float"
             },
             "colsample_bytree": {
-                "default_value": None,
-                "description": "Subsample ratio of columns when constructing each tree."
+                "default_value": 1.0,
+                "description": "Subsample ratio of columns when constructing each tree.",
+                "type": "float"
             },
             "colsample_bylevel": {
-                "default_value": None,
-                "description": "Subsample ratio of columns for each level."
+                "default_value": 1.0,
+                "description": "Subsample ratio of columns for each level.",
+                "type": "float"
             },
             "colsample_bynode": {
-                "default_value": None,
-                "description": "Subsample ratio of columns for each split."
+                "default_value": 1.0,
+                "description": "Subsample ratio of columns for each split.",
+                "type": "float"
             },
             "reg_alpha": {
-                "default_value": None,
-                "description": "L1 regularization term on weights"
+                "default_value": 0.0,
+                "description": "L1 regularization term on weights",
+                "type": "float"
             },
             "reg_lambda": {
-                "default_value": None,
-                "description": "L2 regularization term on weights"
+                "default_value": 0.0,
+                "description": "L2 regularization term on weights",
+                "type": "float"
             },
             "scale_pos_weight": {
-                "default_value": None,
-                "description": "Balancing of positive and negative weights."
+                "default_value": 1.0,
+                "description": "Balancing of positive and negative weights.",
+                "type": "float"
             },
             "random_state": {
-                "default_value": None,
-                "description": "Random number seed."
+                "default_value": 0,
+                "description": "Random number seed.",
+                "type": "int"
             },
             "base_score": {
-                "default_value": None,
-                "description": "The initial prediction score of all instances, global bias."
+                "default_value": 0.5,
+                "description": "The initial prediction score of all instances, global bias.",
+                "type": "float"
             },
-            "missing": {
-                "default_value": None,
-                "description": "Value in the data which needs to be present as a missing value."
-            },
+            # "missing": {
+            #     "default_value": None,
+            #     "description": "Value in the data which needs to be present as a missing value.",
+            #     "type": "float"
+            # },
             "num_parallel_tree": {
-                "default_value": None,
-                "description": "Used for boosting random forest."
+                "default_value": 1,
+                "description": "Used for boosting random forest.",
+                "type": "int"
             },
-            "monotone_constraints": {
-                "default_value": None,
-                "description": " Constraint of variable monotonicity.  "
-                               "See tutorial for more information."
-            },
-            "interaction_constraints": {
-                "default_value": None,
-                "description": '''
-                Constraints for interaction representing permitted interactions.  The
-                constraints must be specified in the form of a nest list, e.g. [[0, 1],
-                [2, 3, 4]], where each inner list is a group of indices of features
-                that are allowed to interact with each other.  See tutorial for more
-                information
-                '''
-            },
+            # "monotone_constraints": {
+            #     "default_value": "(0,0)",
+            #     "description": " Constraint of variable monotonicity.  "
+            #                    "See tutorial for more information.",
+            #     "type": "str"
+            # },
+            # "interaction_constraints": {
+            #     "default_value": None,
+            #     "description": '''
+            #     Constraints for interaction representing permitted interactions.  The
+            #     constraints must be specified in the form of a nest list, e.g. [[0, 1],
+            #     [2, 3, 4]], where each inner list is a group of indices of features
+            #     that are allowed to interact with each other.  See tutorial for more
+            #     information
+            #     ''',
+            #     "type": "str"
+            # },
             "importance_type": {
                 "default_value": "gain",
                 "description": '''
                 The feature importance type for the feature_importances. property:
                 either "gain", "weight", "cover", "total_gain" or "total_cover".
-                '''
+                ''',
+                "type": ["gain", "weight", "cover", "total_gain", "total_cover"]
             }
         }
 
